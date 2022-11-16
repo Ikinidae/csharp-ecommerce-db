@@ -44,19 +44,24 @@ if (products.Count == 0)
     db.Products.Add(product9);
     db.Products.Add(product10);
 
+    Customer sandro = new Customer { Name = "Sandro", Surname = "Ficini", Email = "sandro.duck@honk.it" };
+    db.Customers.Add(sandro);
+    Employee chicco = new Employee { Name = "Chicco", Surname = "Ricco" };
+    db.Employees.Add(chicco);
+
     db.SaveChanges();
 
     //funzione che chieda se si è dipendenti o cliente
-    RichiestaRuolo();
+    RoleRequest();
 }
 else
 {
     //funzione che chieda se si è dipendenti o cliente
-    RichiestaRuolo();
+    RoleRequest();
 }
 
 
-void RichiestaRuolo ()
+void RoleRequest ()
 {
     Console.WriteLine("Sei un dipendente o un cliente?");
     string user = Console.ReadLine();
@@ -73,7 +78,34 @@ void RichiestaRuolo ()
             Console.WriteLine("Nome: {0}\ndescrizione: {1}\nprezzo: {2} euro", product.Name, product.Description, product.Price);
             Console.WriteLine("--------------------------------");
         }
+        Console.WriteLine("Vuoi effettuare un ordine? [si/no]");
+        string inputOrder = Console.ReadLine();
+        if (inputOrder == "si")
+        {
+            Console.WriteLine("Scrivi quanti prodotti vuoi acquistare:");
+            int numberItems = Convert.ToInt32(Console.ReadLine());
+            List<String> items = new List<String>();
 
+            for (int i = 0; i < numberItems; i++)
+            {
+                Console.WriteLine("Scrivi il nome del prodotto:");
+                string inputItem = Console.ReadLine();
+                items.Add(inputItem);
+            }
+
+            Random rnd = new Random();
+            Order newOrder = new Order() { Date = DateTime.Today, Amount = numberItems, Status = rnd.Next(2) == 1, CustomerId = 1, EmployeeId = 1 };
+
+            newOrder.Products = new List<Product>();
+            foreach (String item in items)
+            {
+                Product orderedProduct = db.Products.Where(product => product.Name == item).FirstOrDefault();
+                newOrder.Products.Add(orderedProduct);
+            }
+
+            db.Orders.Add(newOrder);
+            db.SaveChanges();
+        }
     }
     else
         Console.WriteLine("Inserire un'opzione valida");
